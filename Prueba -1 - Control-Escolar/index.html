@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control Escolar</title>
+    <!-- Enlace al nuevo archivo CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div style="max-width: 800px; margin: 0 auto; text-align: right; margin-bottom: -15px;">
+        <button onclick="cerrarSesion()" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Cerrar Sesión</button>
+    </div>
+    <!-- Módulo 1: Materias -->
+    <div class="contenedor">
+        <h2>Catálogo de Materias</h2>
+        <form id="form-materia" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="clave" placeholder="Clave (ej. CS-102)" required style="padding: 8px;">
+            <input type="text" id="nombre" placeholder="Nombre de la materia" required style="padding: 8px; flex-grow: 1;">
+            <input type="number" id="creditos" placeholder="Créditos" required style="padding: 8px; width: 100px;">
+            <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px;">Guardar Materia</button>
+        </form>
+        <table>
+            <thead><tr><th>ID</th><th>Clave</th><th>Nombre</th><th>Créditos</th></tr></thead>
+            <tbody id="tabla-materias"></tbody>
+        </table>
+    </div>
+
+    <!-- Módulo 2: Alumnos -->
+    <div class="contenedor">
+        <h2>Directorio de Alumnos</h2>
+        <form id="form-alumno" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <input type="text" id="matricula" placeholder="Matrícula (ej. E25081155)" required style="padding: 8px;">
+            <input type="password" id="password" placeholder="Contraseña" required style="padding: 8px;">
+            <input type="text" id="nombre-alumno" placeholder="Nombre(s)" required style="padding: 8px; flex-grow: 1;">
+            <input type="text" id="apellidos-alumno" placeholder="Apellidos" required style="padding: 8px; flex-grow: 1;">
+            <button type="submit" style="background-color: #0056b3; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px;">Guardar Alumno</button>
+        </form>
+        <table>
+            <thead><tr><th>ID</th><th>Matrícula</th><th>Nombre</th><th>Apellidos</th></tr></thead>
+            <tbody id="tabla-alumnos"></tbody>
+        </table>
+    </div>
+
+    <!-- Módulo 3: Calificaciones -->
+    <div class="contenedor" style="margin-bottom: 50px;">
+        <h2>Registro de Calificaciones</h2>
+        <form id="form-calificacion" style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <input type="number" id="id-alumno" placeholder="ID Alumno (ej. 1)" required style="padding: 8px; width: 140px;">
+            <input type="number" id="id-materia" placeholder="ID Materia (ej. 2)" required style="padding: 8px; width: 140px;">
+            <input type="text" id="ciclo" placeholder="Ciclo (ej. 2026-B)" required style="padding: 8px; flex-grow: 1;">
+            <input type="number" id="valor" step="0.1" placeholder="Calificación final" required style="padding: 8px; width: 140px;">
+            <button type="submit" style="background-color: #ffc107; color: #333; font-weight: bold; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px;">Guardar Calificación</button>
+        </form>
+        <table>
+            <thead><tr><th>Folio (ID)</th><th>ID Alumno</th><th>ID Materia</th><th>Ciclo</th><th>Calificación</th></tr></thead>
+            <tbody id="tabla-calificaciones"></tbody>
+        </table>
+    </div>
+
+    <!-- Enlace al nuevo archivo JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

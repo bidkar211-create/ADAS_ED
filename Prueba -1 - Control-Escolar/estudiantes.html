@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Estudiante - Control Escolar</title>
+    <!-- Enlace a tu archivo CSS existente -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Botón de Cerrar Sesión -->
+    <div style="max-width: 800px; margin: 20px auto 0 auto; text-align: right;">
+        <button onclick="cerrarSesion()" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Cerrar Sesión</button>
+    </div>
+
+    <!-- Módulo: Datos del Estudiante -->
+    <div class="contenedor">
+        <h2>Mi Información Personal</h2>
+        <div id="info-estudiante" style="padding: 10px 0; font-size: 16px;">
+            <p><strong>Matrícula:</strong> <span id="lbl-matricula">Cargando...</span></p>
+            <p><strong>Nombre:</strong> <span id="lbl-nombre">Cargando...</span></p>
+            <p><strong>Apellidos:</strong> <span id="lbl-apellidos">Cargando...</span></p>
+        </div>
+    </div>
+
+    <!-- Módulo: Mis Calificaciones -->
+    <div class="contenedor" style="margin-bottom: 50px;">
+        <h2>Mis Calificaciones y Materias</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Clave Materia</th>
+                    <th>Materia</th>
+                    <th>Ciclo</th>
+                    <th>Calificación</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-mis-calificaciones">
+                <!-- Se llenará automáticamente con JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Script para cargar los datos del alumno -->
+    <script>
+        // Función para cerrar sesión
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        // Al cargar la página, traemos los datos del backend
+        window.addEventListener('DOMContentLoaded', async () => {
+            const usuarioId = localStorage.getItem('usuarioId');
+
+            if (!usuarioId) {
+                alert("No hay una sesión activa. Por favor, inicia sesión.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // 1. Cargar datos personales del alumno
+                const respAlumno = await fetch(`http://127.0.0.1:8000/alumnos/usuario/${usuarioId}`);
+                if (respAlumno.ok) {
+                    const alumno = await respAlumno.json();
+                    document.getElementById('lbl-matricula').textContent = alumno.matricula; // <--- ¡Agrega esta línea!
+                    document.getElementById('lbl-nombre').textContent = alumno.nombre;
+                    document.getElementById('lbl-apellidos').textContent = alumno.apellidos;
+                }
+
+                // 2. Cargar las calificaciones del alumno
+                const respCalfs = await fetch(`http://127.0.0.1:8000/calificaciones/alumno/${usuarioId}`);
+                if (respCalfs.ok) {
+                    const calificaciones = await respCalfs.json();
+                    const tbody = document.getElementById('tabla-mis-calificaciones');
+                    tbody.innerHTML = '';
+
+                    if (calificaciones.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No tienes calificaciones registradas aún.</td></tr>';
+                        return;
+                    }
+
+                    calificaciones.forEach(c => {
+                        const fila = `<tr>
+                            <td>${c.materia_clave}</td>
+                            <td>${c.materia_nombre}</td>
+                            <td>${c.ciclo}</td>
+                            <td><strong>${c.valor}</strong></td>
+                        </tr>`;
+                        tbody.innerHTML += fila;
+                    });
+                }
+            } catch (error) {
+                console.error("Error al conectar con el servidor:", error);
+                alert("Error al cargar los datos del estudiante.");
+            }
+        });
+    </script>
+</body>
+</html>

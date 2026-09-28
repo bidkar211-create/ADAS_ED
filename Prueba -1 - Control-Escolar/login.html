@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Control Escolar</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .login-card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 320px; 
+            text-align: center; 
+        }
+        h2 { color: #0056b3; margin-top: 0; margin-bottom: 25px; }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            width: 100%; 
+            background-color: #0056b3; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+        }
+        button:hover { background-color: #004494; }
+        .error-msg { 
+            color: #dc3545; 
+            margin-top: 15px; 
+            font-size: 14px; 
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>Acceso al Sistema</h2>
+        <form id="form-login">
+            <input type="text" id="matricula" placeholder="Matrícula" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Entrar</button>
+            <p id="error-msg" class="error-msg">Matrícula o contraseña incorrectas.</p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('form-login').addEventListener('submit', async function(evento) {
+            evento.preventDefault();
+            
+            const matricula = document.getElementById('matricula').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            
+            try {
+                // 1. Enviar credenciales al backend
+                const respuesta = await fetch('http://127.0.0.1:8000/login/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matricula: matricula, password: password })
+                });
+
+                if (respuesta.ok) {
+                    const datos = await respuesta.json();
+                    
+                    // 2. Guardar el "gafete" de identidad en el navegador
+                    localStorage.setItem('sesionActiva', 'true');
+                    localStorage.setItem('usuarioId', datos.usuario_id);
+                    localStorage.setItem('usuarioRol', datos.rol);
+                    
+                    // 3. Redirigir automáticamente según el rol del usuario
+                    const rolUsuario = datos.rol.trim().toLowerCase(); // Lo pasamos a minúsculas para evitar errores con "Profesor" o "profesor"
+                    
+                    if (rolUsuario === 'profesor') {
+                        window.location.href = 'index.html';
+                    } else if (rolUsuario === 'estudiante' || rolUsuario === 'alumno') {
+                        window.location.href = 'estudiantes.html';
+                    } else {
+                        window.location.href = 'index.html'; // Por defecto si hay otro rol
+                    }
+
+                } else {
+                    // Mostrar texto rojo si el backend rechaza el acceso
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Fallo de conexión:", error);
+                alert("Error al conectar con el servidor. Verifica que FastAPI esté corriendo.");
+            }
+        });
+    </script>
+
+</body>
+</html>
